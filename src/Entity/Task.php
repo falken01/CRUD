@@ -22,7 +22,7 @@ class Task
     private $title;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", nullable=true)
      */
     private $date;
 
@@ -48,7 +48,7 @@ class Task
         return $this;
     }
 
-    public function getDate(): ?date
+    public function getDate(): ?string
     {
         return $this->date;
     }

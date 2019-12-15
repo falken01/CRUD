@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 class MainController extends AbstractController
 {
   /**
-  * @Route("/files/get", name="show_files")
+  * @Route("/files/get", name="show_tasks")
   */
   public function showFiles()
   {
@@ -43,7 +43,6 @@ class MainController extends AbstractController
     $task = new Task();
     $form = $this->createFormBuilder($task)->add('title', TextType::class, array('attr' => array('class'=>'form-control')))
                                            ->add('description', TextareaType::class, array('attr'=> array('class'=>'form-control')))
-                                           ->add('date', DateType::class, array('label'=>'Date', 'attr'=>array('class' => 'form-control')))
                                            ->add('save', SubmitType::class, array('label'=>'Create', 'attr'=>array('class' => 'btn btn-dark float-left mt-3', 'style'=>'width:48%;')))
                                            ->add('reset', ResetType::class, array('label'=>'Reset', 'attr'=>array('class'=> 'btn btn-dark float-right mt-3',  'style'=>'width:48%;')
                                          ))
@@ -55,11 +54,58 @@ class MainController extends AbstractController
         $entityManager=$this->getDoctrine()->getManager();
         $entityManager -> persist($task);
         $entityManager -> flush();
-        return $this->redirectToRoute('HomePage/HomePage.html.twig');
+        return $this->redirectToRoute('show_files');
     }
     return $this->render('Tasks/Tasks.html.twig', [
       'form'=>$form->createView()
+
+    ]);
+  }
+
+  /**
+  * @Route("/files/delete/{id}", name="delete_task")
+  */
+  public function delete(Request $request, $id)
+  {
+    $task = $this->getDoctrine()->getRepository(Task::class)->find($id);
+    $entityManager = $this->getDoctrine()->getManager();
+    $entityManager->remove($task);
+    $entityManager->flush();
+    return $this->redirectToRoute('show_files');
+  }
+  /**
+  * @Route("/files/edit/{id}", name="edit_task")
+  */
+  public function edit(Request $request, $id)
+  {
+    $task = new Task();
+    $task = $this->getDoctrine()->getRepository(Task::class)->find($id);
+
+    $form = $this->createFormBuilder($task)
+    ->add('title',
+            TextType::class,
+            array(
+              'attr'=>
+              array(
+                  'class'=>'form-control',
+                   'required'=>'false')
+                 ))
+    ->add('description', TextareaType::class, array('attr'=>array('class'=>'form-control', 'required'=>'false')))
+    ->add('Zapisz', SubmitType::class, array('attr'=>array('class'=>'btn btn-dark float-left mt-3', 'style'=>'width:48%')))
+    ->add('Reset', ResetType::class, array('attr'=>array('class'=>'btn btn-dark float-right mt-3', 'href'=>'show_files', 'style'=>'width:48%')
+  ))
+  ->getForm();
+  $form->handleRequest($request);
+    if($form->isSubmitted() && $form->isValid())
+    {
+      $this->getDoctrine()->getManager()->flush();
+      return $this->redirectToRoute('show_files');
+    }
+    return $this->render('Tasks/Tasks.html.twig', [
+      'form'=>$form->createView()
+
     ]);
   }
 }
+
 ?>
