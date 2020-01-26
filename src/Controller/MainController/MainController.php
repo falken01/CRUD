@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 class MainController extends AbstractController
 {
   /**
-  * @Route("/files/get", name="show_tasks")
+  * @Route("/files/get", name="show_files")
   */
   public function showFiles()
   {
